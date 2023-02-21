@@ -21,7 +21,7 @@ public class FishItemsController : ControllerBase
     }
 
     // GET http://localhost:5222/{a-guid}
-    [HttpGet("fishId")]
+    [HttpGet("{fishId}")]
     public FishItem Get([FromRoute] Guid fishId)
     {
         return _repo.GetFishItem(fishId);
