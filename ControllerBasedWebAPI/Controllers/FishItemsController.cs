@@ -13,21 +13,22 @@ public class FishItemsController : ControllerBase
         _repo = repo ?? throw new ArgumentNullException(nameof(repo));
     }
 
-    // GET http://localhost:5222
+    // GET http://localhost:5222/fishitems
     [HttpGet]
     public IEnumerable<FishItem> GetAll()
     {
         return _repo.GetFishItems();
     }
 
-    // GET http://localhost:5222/{a-guid}
-    [HttpGet("{fishId}")]
+    // GET http://localhost:5222/fishitems/{a-guid}
+    [Route("{fishId}")]
+    [HttpGet]
     public FishItem Get([FromRoute] Guid fishId)
     {
         return _repo.GetFishItem(fishId);
     }
 
-    // POST http://localhost:5222/ with body
+    // POST http://localhost:5222/fishitems with body
     [HttpPost]
     public ActionResult<FishItem> Add([FromBody] FishItem fishItem)
     {
@@ -35,6 +36,7 @@ public class FishItemsController : ControllerBase
         return CreatedAtAction(nameof(Get), new { fishId = newItem.Id }, newItem);
     }
 
+    // PUT http://localhost:5222/fishitems/{a-guid}
     [HttpPut("{fishId}")]
     public FishItem Update(Guid fishId, FishItem newItem)
     {
@@ -42,9 +44,17 @@ public class FishItemsController : ControllerBase
         return _repo.Update(newItem);
     }
 
+    // DELETE http://localhost:5222/fishitems/{a-guid}
     [HttpDelete("{fishId}")]
     public void Delete(Guid fishId)
     {
         _ = _repo.Delete(fishId);
     }
+
+    // [HttpGet]
+    // [Route("/forwards/{*value}")]
+    // public IActionResult SlugDemo(string value)
+    // {
+    //     return Ok(value);
+    // }
 }
