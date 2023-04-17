@@ -1,3 +1,4 @@
+using System.Net;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ControllerBasedWebAPI;
@@ -23,13 +24,21 @@ public class FishItemsController : ControllerBase
     // GET http://localhost:5222/fishitems/{a-guid}
     [Route("{fishId}")]
     [HttpGet]
-    public FishItem Get([FromRoute] Guid fishId)
+    [ProducesResponseType(typeof(FishItem), (int)HttpStatusCode.OK)]
+    [ProducesResponseType(typeof(NotFoundResult), (int)HttpStatusCode.NotFound)]
+    public IActionResult Get([FromRoute] Guid fishId)
     {
-        return _repo.GetFishItem(fishId);
+        FishItem? fishItem = _repo.GetFishItem(fishId);
+        if(fishItem is null)
+        {
+            return NotFound();
+        }
+        return Ok(fishItem);
     }
 
     // POST http://localhost:5222/fishitems with body
     [HttpPost]
+    [ProducesResponseType(typeof(FishItem), (int)HttpStatusCode.Created)]
     public ActionResult<FishItem> Add([FromBody] FishItem fishItem)
     {
         FishItem newItem = _repo.AddFishItem(fishItem);
