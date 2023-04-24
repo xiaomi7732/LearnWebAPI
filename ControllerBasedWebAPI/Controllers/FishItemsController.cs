@@ -24,21 +24,22 @@ public class FishItemsController : ControllerBase
     // GET http://localhost:5222/fishitems/{a-guid}
     [Route("{fishId}")]
     [HttpGet]
-    [ProducesResponseType(typeof(FishItem), (int)HttpStatusCode.OK)]
-    [ProducesResponseType(typeof(NotFoundResult), (int)HttpStatusCode.NotFound)]
-    public IActionResult Get([FromRoute] Guid fishId)
+    [ProducesResponseType((int)HttpStatusCode.OK)]
+    [ProducesResponseType((int)HttpStatusCode.NotFound)]
+    public ActionResult<FishItem> Get([FromRoute] Guid fishId)
     {
         FishItem? fishItem = _repo.GetFishItem(fishId);
-        if(fishItem is null)
+        if (fishItem is null)
         {
             return NotFound();
         }
-        return Ok(fishItem);
+        // fishItem will be implicitly converted to ActionResult<FishItem>.
+        return fishItem;
     }
 
     // POST http://localhost:5222/fishitems with body
     [HttpPost]
-    [ProducesResponseType(typeof(FishItem), (int)HttpStatusCode.Created)]
+    [ProducesResponseType((int)HttpStatusCode.Created)]
     public ActionResult<FishItem> Add([FromBody] FishItem fishItem)
     {
         FishItem newItem = _repo.AddFishItem(fishItem);
@@ -47,17 +48,26 @@ public class FishItemsController : ControllerBase
 
     // PUT http://localhost:5222/fishitems/{a-guid}
     [HttpPut("{fishId}")]
-    public FishItem Update(Guid fishId, FishItem newItem)
+    public ActionResult<FishItem> Update(Guid fishId, FishItem newItem)
     {
         newItem.Id = fishId;
-        return _repo.Update(newItem);
+        FishItem? updatedFishItem = _repo.Update(newItem);
+        if(updatedFishItem is null)
+        {
+            return BadRequest();
+        }
+        return updatedFishItem;
     }
 
     // DELETE http://localhost:5222/fishitems/{a-guid}
     [HttpDelete("{fishId}")]
-    public void Delete(Guid fishId)
+    public ActionResult Delete(Guid fishId)
     {
-        _ = _repo.Delete(fishId);
+        if(_repo.Delete(fishId))
+        {
+            return NoContent();
+        }
+        return NotFound();
     }
 
     // [HttpGet]
